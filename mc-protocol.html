@@ -1,0 +1,41 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mc-protocol',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            plcaddress: {value:""},
+            plcport: {value:""},
+            device: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"mc-protocol";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="mc-protocol">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-plcaddress"><i class="icon-tag"></i> PLC Addr</label>
+        <input type="text" id="node-input-plcaddress" placeholder="PLC Address">
+    </div>
+    <div class="form-row">
+        <label for="node-input-plcport"><i class="icon-tag"></i> PLC Port</label>
+        <input type="text" id="node-input-plcport" placeholder="PLC Port">
+    </div>
+    <div class="form-row">
+        <label for="node-input-device"><i class="icon-tag"></i> Device</label>
+        <input type="text" id="node-input-device" placeholder="Device">
+    </div>    
+</script>
+
+<script type="text/x-red" data-help-name="mc-protocol">
+    <p>A simple node that converts the message payloads into all lower-case characters</p>
+</script>
