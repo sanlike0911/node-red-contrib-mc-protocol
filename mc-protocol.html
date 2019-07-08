@@ -1,4 +1,4 @@
-<script type="text/x-red" data-template-name="mc-protocol">
+<script type="text/x-red" data-template-name="mc-protocol-read">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -12,13 +12,13 @@
         <input type="text" id="node-input-plcport" placeholder="PLC Port">
     </div>
     <div class="form-row">
-        <label for="node-input-device"><i class="icon-tag"></i> Device</label>
-        <input type="text" id="node-input-device" placeholder="Device">
+        <label for="node-input-devicestring"><i class="icon-tag"></i> Device</label>
+        <input type="text" id="node-input-devicestring" placeholder="Device">
     </div>
 
 </script>
 
-<script type="text/x-red" data-help-name="mc-protocol">
+<script type="text/x-red" data-help-name="mc-protocol-read">
     <p>mcprotocol is a library that allows communication to Mitsubishi PLCs (currently only FX3U tested) using the MC (MELSEC Communication) Ethernet protocol as documented by Mitsubishi.</br>
     This software is not affiliated with Mitsubishi in any way, nor am I. FX3U and MELSEC are trademarks of Mitsubishi.</br>
     WARNING - This is BETA CODE and you need to be aware that WRONG VALUES could be written to WRONG LOCATIONS. Fully test everything you do. In situations where writing to a random area of memory within the PLC could cost you money, back up your data and test this really well. If this could injure someone or worse, consider other software.</br>
@@ -37,8 +37,7 @@
         <dt>examples</dt>
         <dd>See setTranslationCB below for more examples</br>
         </br>
-        <code>Device - {"TEST1":"D0,5","TEST2":"M6990,28"}</code>
-        </br>
+        <p><code>Device - {"TEST1":"D0,5","TEST2":"M6990,28"}</code></p>
         </br>
         <ul>
             <li><code>TEST1: "D0,5"</code> -   5 words starting at D0</li>
@@ -74,22 +73,115 @@
 
 <script type="text/javascript">
 
-    RED.nodes.registerType('mc-protocol',{
-        category: 'function',
+    RED.nodes.registerType('mc-protocol-read',{
+        category: 'output',
         color: '#a6bbcf',
         defaults: {
             name: {value:""},
             plcaddress: {value:""},
             plcport: {value:""},
-            device: {value:""}
+            devicestring: {value:""}
         },
         inputs:1,
         outputs:1,
         icon: "file.png",
         label: function() {
-            return this.name||"mc-protocol";
+            return this.name||"mc-protocol-read";
         }
     });
 
 </script>
-    
+
+<script type="text/x-red" data-template-name="mc-protocol-write">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-plcaddress"><i class="icon-tag"></i> PLC Addr</label>
+        <input type="text" id="node-input-plcaddress" placeholder="PLC Address">
+    </div>
+    <div class="form-row">
+        <label for="node-input-plcport"><i class="icon-tag"></i> PLC Port</label>
+        <input type="text" id="node-input-plcport" placeholder="PLC Port">
+    </div>
+    <div class="form-row">
+        <label for="node-input-devicestring"><i class="icon-tag"></i> Device</label>
+        <input type="text" id="node-input-devicestring" placeholder="Device">
+    </div>
+
+</script>
+
+<script type="text/x-red" data-help-name="mc-protocol-write">
+    <p>mcprotocol is a library that allows communication to Mitsubishi PLCs (currently only FX3U tested) using the MC (MELSEC Communication) Ethernet protocol as documented by Mitsubishi.</br>
+    This software is not affiliated with Mitsubishi in any way, nor am I. FX3U and MELSEC are trademarks of Mitsubishi.</br>
+    WARNING - This is BETA CODE and you need to be aware that WRONG VALUES could be written to WRONG LOCATIONS. Fully test everything you do. In situations where writing to a random area of memory within the PLC could cost you money, back up your data and test this really well. If this could injure someone or worse, consider other software.</br>
+<!--
+    It is optimized - it sorts a large number of items being requested from the PLC and decides what overall data areas to request, then it groups multiple small requests together in a single packet or number of packets up to the maximum length the protocol supports. So a request for 100 different bits, all close (but not necessarily completely contiguous) will be grouped in one single request to the PLC, with no additional direction from the user.</br>
+    mcprotocol manages reconnects for you. So if the connection is lost because the PLC is powered down or disconnected, you can continue to request data with no other action necessary. "Bad" values are returned, and eventually the connection will be automatically restored.</br>
+    mcprotocol is written entirely in JavaScript, so no compiler or Python installation is necessary on Windows, and deployment on other platforms (ARM, etc) should be trivial.</br>
+    Either ASCII or binary communication is supported. Binary communication is the default, as it is faster as less data is actually sent.</br>
+    This has been tested only on direct connection to FX3U-ENET and FX3U-ENET-ADP. The Q-series E71 appears to support the same frames and should (in theory) work, but other PLCs are not supported. Serial port access is not supported either - the protocol is slightly different. This only sends and receives "A compatible 1E frames".</br>
+    UDP connections are not currently possible.</br>
+    To configure a compatible connection on your FX with an FX3U-ENET, create a connection in the list (in FX-Configurator-EN for FX3U-ENET or GXWorks2 PLC Parameter for FX3U-ENET-ADP), Protocol "TCP", Open System "Unpassive", (Fixed buffer can be send or receive if using a FX3U-ENET), Fixed Buffer Communication Procedure set to "Procedure Exist (MC)", "Pairing Open" set to "Disable", Existence Confirmation set to "Confirm" (No Confirm works as well, but can keep connections open for a long time causing failed reconnects) and "Port" set to a value that is the same as what you set when you initiate the connection from node.js.</br>
+    With an FX3U-ENET-ADP the process is simpler - in GXWorks2, under PLC Parameter, Ethernet Setting, Open Setting, make sure one of the connections is set up as "TCP", "MC Protocol" and a matching port</p>
+-->
+    <h3>Device</h3>
+    <dl class="message-properties">
+        <dt>examples</dt>
+        <dd>See setTranslationCB below for more examples</br>
+        </br>
+        <p><code>Device - {"TEST1":"D0,5","TEST2":"M6990,28"}</code></p>
+        </br>
+        <ul>
+            <li><code>TEST1: "D0,5"</code> -   5 words starting at D0</li>
+            <li><code>TEST2: "M6990,28"</code> -   28 bits at M6990</li>
+            <li><code>TEST3: "CN199,2"</code> -   ILLEGAL as CN199 is 16-bit, CN200 is 32-bit, must request separately</li>
+            <li><code>TEST4: "R2000,2"</code> -   2 words at R2000</li>
+            <li><code>TEST5: "X034"</code> -   Simple input</li>
+            <li><code>TEST6: "D6000.1,20"</code> -   20 bits starting at D6000.1</li>
+            <li><code>TEST7: "D6001.2"</code> -   Single bit at D6001</li>
+            <li><code>TEST8: "S4,2"</code> -   2 bits at S4</li>
+            <li><code>TEST9: "RFLOAT5000,40"</code> -  40 floating point numbers at R5000</li>
+        </ul>
+        </dd>
+        </br>
+        <dt>type</dt>
+        <dd>       
+        <ul>
+            <li><code>D</code> -  Data</li>
+            <li><code>R</code> -  Extension</li>
+            <li><code>TN</code> -  Timer current value</li>
+            <li><code>CN</code> -  Counter current value</li>
+            <li><code>TS</code> -  Timer contact</li>
+            <li><code>CS</code> -  Counter contact</li>
+            <li><code>X</code> -  Input</li>
+            <li><code>Y</code> -  Output</li>
+            <li><code>M</code> -  Auxiliary Relay</li>
+            <li><code>S</code> -  State</li>
+        </ul>
+        </dd>
+    </dl>
+
+</script>
+
+<script type="text/javascript">
+
+    RED.nodes.registerType('mc-protocol-write',{
+        category: 'input',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            plcaddress: {value:""},
+            plcport: {value:""},
+            devicestring: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"mc-protocol-write";
+        }
+    });
+
+</script>
