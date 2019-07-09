@@ -1,4 +1,4 @@
-<script type="text/x-red" data-template-name="mc-protocol-read">
+<script type="text/x-red" data-template-name="mc-protocol-out">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -18,7 +18,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="mc-protocol-read">
+<script type="text/x-red" data-help-name="mc-protocol-out">
     <p>mcprotocol is a library that allows communication to Mitsubishi PLCs (currently only FX3U tested) using the MC (MELSEC Communication) Ethernet protocol as documented by Mitsubishi.</br>
     This software is not affiliated with Mitsubishi in any way, nor am I. FX3U and MELSEC are trademarks of Mitsubishi.</br>
     WARNING - This is BETA CODE and you need to be aware that WRONG VALUES could be written to WRONG LOCATIONS. Fully test everything you do. In situations where writing to a random area of memory within the PLC could cost you money, back up your data and test this really well. If this could injure someone or worse, consider other software.</br>
@@ -73,9 +73,9 @@
 
 <script type="text/javascript">
 
-    RED.nodes.registerType('mc-protocol-read',{
+    RED.nodes.registerType('mc-protocol-out',{
         category: 'output',
-        color: '#a6bbcf',
+        color: '#FDD0A2',
         defaults: {
             name: {value:""},
             plcaddress: {value:""},
@@ -86,13 +86,13 @@
         outputs:1,
         icon: "file.png",
         label: function() {
-            return this.name||"mc-protocol-read";
+            return this.name||"mc-protocol-out";
         }
     });
 
 </script>
 
-<script type="text/x-red" data-template-name="mc-protocol-write">
+<script type="text/x-red" data-template-name="mc-protocol-in">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -112,7 +112,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="mc-protocol-write">
+<script type="text/x-red" data-help-name="mc-protocol-in">
     <p>mcprotocol is a library that allows communication to Mitsubishi PLCs (currently only FX3U tested) using the MC (MELSEC Communication) Ethernet protocol as documented by Mitsubishi.</br>
     This software is not affiliated with Mitsubishi in any way, nor am I. FX3U and MELSEC are trademarks of Mitsubishi.</br>
     WARNING - This is BETA CODE and you need to be aware that WRONG VALUES could be written to WRONG LOCATIONS. Fully test everything you do. In situations where writing to a random area of memory within the PLC could cost you money, back up your data and test this really well. If this could injure someone or worse, consider other software.</br>
@@ -167,9 +167,9 @@
 
 <script type="text/javascript">
 
-    RED.nodes.registerType('mc-protocol-write',{
+    RED.nodes.registerType('mc-protocol-in',{
         category: 'input',
-        color: '#a6bbcf',
+        color: '#FDD0A2',
         defaults: {
             name: {value:""},
             plcaddress: {value:""},
@@ -180,7 +180,7 @@
         outputs:1,
         icon: "file.png",
         label: function() {
-            return this.name||"mc-protocol-write";
+            return this.name||"mc-protocol-in";
         }
     });
 
