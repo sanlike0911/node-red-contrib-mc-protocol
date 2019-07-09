@@ -15,27 +15,49 @@
  **/
 module.exports = function(RED) {
     'use strict';
-    var _mdMcProtocol = require('mcprotocol');
+    var mdMcProtocol = require('mcprotocol');
 
-    // Configuration Node
-    function McProtocolReadNode(n) {
-        this.log("mc-protocol-read:McProtocolReadNode");
+    // 0:disable, 1:debug, 2:info, 3:warning, 4:error
+    const DebugLevel = 4;
+    const tmrUpdateConectionStatus = 3000;
+
+    /**
+     * debugLog
+     * @param string _text
+     * @param numbar _lv 0:disable, 1:debug, 2:info, 3:warning, 4:error
+     * @private
+     */    
+    function debugLog(_node, _text, _lv = 1){
+        if(_lv >= DebugLevel) _node.log(_text);
+    }
+
+    /**
+     * Configuration In Node
+     * @param {object} n
+     * @private
+     */       
+    function McProtocolInNode(n) {
+        debugLog(this, "mc-protocol-in:McProtocolInNode",1);
         RED.nodes.createNode(this,n);
         this.plcaddress = n.plcaddress;
         this.plcport = n.plcport;
         this.devicestring = n.devicestring;
 
         var node = this;
-        var mdConnection = new _mdMcProtocol;
+        var mdConnection = new mdMcProtocol;
         var isoConnectionState = -1;
         var devicevariablesOld = "";
 
-        // updateConnectionStats
+        /**
+         * updateConnectionStats
+         * @param void
+         * @private
+         */
         var updateConnectionStats = function () {
-            //node.log("mc-protocol-read:updateConnectionStats");
+            debugLog(node,"mc-protocol-in:updateConnectionStats",0);
             // status
             if(isoConnectionState!==mdConnection.isoConnectionState){
-                //node.log("update status:"+isoConnectionState+" -> "+mdConnection.isoConnectionState);
+                debugLog(node,"update status:"+isoConnectionState+" -> "+mdConnection.isoConnectionState,1);
                 isoConnectionState = mdConnection.isoConnectionState;
                 switch(mdConnection.isoConnectionState){
                 case 0:     // 0
@@ -55,10 +77,66 @@ module.exports = function(RED) {
                 }                
             }         
         }
-        setInterval(updateConnectionStats, 3000);
 
+        /**
+         * plc connect
+         * @param void
+         * @private
+         */   
+        function connect() {
+            debugLog(node,"mc-protocol-in:connect",1);
+            try {
+                if (typeof(mdConnection) !== "undefined") {
+                    mdConnection.initiateConnection({port: node.plcport, host: node.plcaddress, ascii: false}, connected); 
+                }
+            } catch(e) {
+                node.error(e);                
+            }
+
+            /**
+             * call back connected
+             * @param {object} _err
+             * @private
+             */   
+            function connected(_err) {
+                debugLog(node,"mc-protocol-in:connected",1);
+                try {
+                    if (typeof(_err) !== "undefined") {
+                        // We have an error.  Maybe the PLC is not reachable.  
+                        debugLog(node, _err,4);
+                    } else {
+                        debugLog(node, 'connected..',2);
+                    }
+                } catch(e) {
+                    node.error(e);                
+                }
+                return;
+            }    
+        }            
+
+        /**
+         * plc disconnect
+         * @param void
+         * @private
+         */   
+        function disconnect() {
+            debugLog(node,"mc-protocol-in:disconnect",1);
+            try {
+                if (typeof(mdConnection) !== "undefined") {
+                    mdConnection.dropConnection();
+                }
+            } catch(e) {
+                node.error(e);                
+            }
+        }
+
+        /**
+         * node on input
+         * @param {object} msg
+         * @private
+         */       
         node.on('input', function(msg) {
-            //node.log("mc-protocol-read:input");
+            debugLog(node,"mc-protocol-in:input",1);
             try {
                 if (typeof(mdConnection) === "undefined") return;
                 if (mdConnection.isoConnectionState!==4) return;
@@ -72,37 +150,33 @@ module.exports = function(RED) {
                 if (typeof(msg.payload) !== "undefined") {
                     let _result = updateReadItems(msg.payload);
                     if(_result === 1){
-                        node.log("updateReadItems:update");
+                        debugLog(node,"updateReadItems:update",1);
                         let _devicevariablesObject = JSON.parse(msg.payload);
                         // This sets the "translation" to allow us to work with object names defined in our app not in the module
-                        mdConnection.setTranslationCB(function(tag) {return _devicevariablesObject[tag];});
+                        mdConnection.setTranslationCB(function(tag) {debugLog(node,tag,1); return _devicevariablesObject[tag];});
                         for(let _key in _devicevariablesObject) {
                             mdConnection.addItems(_key);
                         }
                     }
                 }
 
-                //mdConnection.addItems(['TestDword1','TestDword2','TestDword3','TestDword4']);
-                //conn.addItems('TestDword1');
-                //conn.addItems('TestDwordBit1');
-                //conn.addItems(['TEST1', 'TEST4']);	
-                //conn.addItems('TEST6');
-                //conn.removeItems(['TEST2', 'TEST3']);  // We could do this.  
-                //conn.writeItems(['TEST5', 'TEST7'], [ true, true ], valuesWritten);  	// You can write an array of items as well.  
-                //conn.writeItems('TEST4', [ 666, 777 ], valuesWritten);  				// You can write a single array item too.  
                 mdConnection.readAllItems(valuesReady);
 
             } catch(e) {
                 node.error(e);                
             }
 
-            // updateReadItems
+            /**
+             * updateReadItems
+             * @param {object} _devicevariables
+             * @private
+             */                
             function updateReadItems(_devicevariables){
-                //node.log("mc-protocol-read:updateReadItems");
+                debugLog(node,"mc-protocol-in:updateReadItems",1);
                 let _update = 0;
                 try {
                     if (typeof(mdConnection) !== "undefined"){
-                        node.log("mc-protocol-read: _devicevariables:"+_devicevariables + " devicevariablesOld:"+devicevariablesOld);
+                        debugLog(node,"mc-protocol-in: _devicevariables:"+_devicevariables + " devicevariablesOld:"+devicevariablesOld,1);
                         if(_devicevariables !== devicevariablesOld){
                             devicevariablesOld = _devicevariables;
                             _update = 1;
@@ -114,23 +188,37 @@ module.exports = function(RED) {
                 return _update;
             }
 
-            // valuesReady
-            function valuesReady(anythingBad, values) {
-                //node.log("mc-protocol-read:valuesReady");
+            /**
+             * call back valuesReady
+             * @param numbar _anythingBad
+             * @param {object} _values
+             * @private
+             */                
+            function valuesReady(_anythingBad, _values) {
+                debugLog(node,"mc-protocol-in:valuesReady",1);
                 try {
-                    if (anythingBad) { node.error("SOMETHING WENT WRONG READING VALUES!!!!"); }
-                    msg.payload = values;
-                    node.send(msg);
+                    if (_anythingBad) {
+                        node.error("SOMETHING WENT WRONG READING VALUES!!!!");
+                    } else {
+                        msg.payload = _values;
+                        node.send(msg);
+                    }
                 } catch(e) {
                     node.error(e);                
                 }
             }
         });        
  
-        node.on('close', function(removed, done) {
-            //node.log("mc-protocol-read:close removed:"+removed);
+        /**
+         * node on close
+         * @param numbar _removed
+         * @param function _done
+         * @private
+         */                
+        node.on('close', function(_removed, _done) {
+            debugLog(node,"mc-protocol-in:close removed:"+_removed,1);
             try {
-                if (removed) {
+                if (_removed) {
                     // This node has been deleted
                     disconnect();
                 } else {
@@ -140,74 +228,45 @@ module.exports = function(RED) {
                 if (typeof(mdConnection) !== "undefined") {
                     mdConnection = {};
                 }
-                done();
+                _done();
             } catch(e) {
                 node.error(e);                
             }
         });
 
-        // plc connect
-        function connect() {
-            //node.log("mc-protocol-read:connect");
-            try {
-                if (typeof(mdConnection) !== "undefined") {
-                    mdConnection.initiateConnection({port: node.plcport, host: node.plcaddress, ascii: false}, connected); 
-                }
-            } catch(e) {
-                node.error(e);                
-            }
-
-            // call back connected
-            function connected(err) {
-                //node.log("mc-protocol-read:connected");
-                try {
-                    if (typeof(err) !== "undefined") {
-                        // We have an error.  Maybe the PLC is not reachable.  
-                        console.log(err);
-                    } else {
-                        console.log('connected..');
-                    }
-                } catch(e) {
-                    node.error(e);                
-                }
-                return;
-            }    
-        }            
-
-        // plc disconect
-        function disconnect() {
-            //node.log("mc-protocol-write:disconnect");
-            try {
-                if (typeof(mdConnection) !== "undefined") {
-                    mdConnection.dropConnection();
-                }
-            } catch(e) {
-                node.error(e);                
-            }
-        }
+        // interval updateConnectionStats
+        setInterval(updateConnectionStats, tmrUpdateConectionStatus);
     }
-    RED.nodes.registerType("mc-protocol-read",McProtocolReadNode);
+    RED.nodes.registerType("mc-protocol-read",McProtocolInNode);
 
-    // Configuration Write Node
-    function McProtocolWriteNode(n) {
-        //this.log("mc-protocol-read:McProtocolWriteNode");
+    /**
+     * Configuration Out Node
+     * @param {object} n
+     * @private
+     */
+    function McProtocolOutNode(n) {
+        debugLog(this, "mc-protocol-out:McProtocolOutNode");
         RED.nodes.createNode(this,n);
         this.plcaddress = n.plcaddress;
         this.plcport = n.plcport;
         this.devicestring = n.devicestring;
 
         var node = this;
-        var mdConnection = new _mdMcProtocol;
+        var mdConnection = new mdMcProtocol;
         var isoConnectionState = -1;
         var devicevariablesOld = "";
 
-        // updateConnectionStats
+        /**
+         * updateConnectionStats
+         * @param void
+         * @private
+         */
         var updateConnectionStats = function () {
-            //node.log("mc-protocol-write:updateConnectionStats");
+            debugLog(node,"mc-protocol-out:updateConnectionStats",0);
             try {
                 // status
                 if(isoConnectionState!==mdConnection.isoConnectionState){
-                    //node.log("update status:"+isoConnectionState+" -> "+mdConnection.isoConnectionState);
+                    debugLog(node,"update status:"+isoConnectionState+" -> "+mdConnection.isoConnectionState,1);
                     isoConnectionState = mdConnection.isoConnectionState;
                     switch(mdConnection.isoConnectionState){
                     case 0:     // 0
@@ -229,11 +288,67 @@ module.exports = function(RED) {
                 node.error(e);                
             }
         }
-        setInterval(updateConnectionStats, 3000);
 
-        // node:input
+        /**
+         * plc connect
+         * @param void
+         * @private
+         */   
+        function connect() {
+            debugLog(node,"mc-protocol-out:connect",1);
+            try {
+                if (typeof(mdConnection) !== "undefined") {
+                    mdConnection.initiateConnection({port: node.plcport, host: node.plcaddress, ascii: false}, connected); 
+                }
+            } catch(e) {
+                node.error(e);                
+            }
+
+            /**
+             * call back connected
+             * @param void
+             * @param {object} _err
+             * @private
+             */   
+            function connected(_err) {
+                debugLog(node,"mc-protocol-out:connected",1);
+                try {
+                    if (typeof(_err) !== "undefined") {
+                        // We have an error.  Maybe the PLC is not reachable.  
+                        debugLog(node, _err,4);
+                    } else {
+                        debugLog(node, 'connected..',2);
+                    }
+                } catch(e) {
+                    node.error(e);                
+                }
+                return;
+            }    
+        }            
+
+        /**
+         * plc disconnect
+         * @param void
+         * @private
+         */   
+        function disconnect() {
+            debugLog(node,"mc-protocol-out:disconnect",1);
+            try {
+                if (typeof(mdConnection) !== "undefined") {
+                    mdConnection.dropConnection();
+                }
+            } catch(e) {
+                node.error(e);                
+            }
+        }
+
+        /**
+         * node on input
+         * @param {object} msg
+         * @private
+         */       
         node.on('input', function(msg) {
-            //node.log("mc-protocol-write:input");
+            debugLog(node,"mc-protocol-out:input",1);
             try {
                 if (typeof(mdConnection) === "undefined") return;
                 if (mdConnection.isoConnectionState!==4)  return;
@@ -247,10 +362,10 @@ module.exports = function(RED) {
                 if (typeof(msg.payload) !== "undefined") {
                     let _result = updateWriteItems(msg.payload);
                     if(_result === 1){
-                        //node.log("updateWriteItems:update payload:"+msg.payload);
+                        debugLog(node,"updateWriteItems:update payload:"+msg.payload,1);
                         let _devicevariablesObject = JSON.parse(msg.payload);
                         // This sets the "translation" to allow us to work with object names defined in our app not in the module
-                        mdConnection.setTranslationCB(function(tag) { console.log(tag); return tag;}); 
+                        mdConnection.setTranslationCB(function(tag) {debugLog(node,tag,1); return tag;}); 
                         let _keys = [];
                         let _values = [];
                         let _index = 0;
@@ -261,19 +376,25 @@ module.exports = function(RED) {
                             ++_index;
                         }
                         mdConnection.writeItems(_keys, _values, valuesWritten);
+                        msg.payload = _devicevariablesObject;
+                        node.send(msg);
                     }
                 }
             } catch(e) {
                 node.error(e);                
             }
 
-            // updateWriteItems
+            /**
+             * updateWriteItems
+             * @param {object} _devicevariables
+             * @private
+             */  
             function updateWriteItems(_devicevariables){
-                //node.log("mc-protocol-write:updateWriteItems");
+                debugLog(node,"mc-protocol-out:updateWriteItems",1);
                 let _update = 0;
                 try {
                     if (typeof(mdConnection) !== "undefined"){
-                        node.log("mc-protocol-write: _devicevariables:"+_devicevariables + " devicevariablesOld:"+devicevariablesOld);
+                        debugLog(node,"mc-protocol-out: _devicevariables:"+_devicevariables + " devicevariablesOld:"+devicevariablesOld,1);
                         if(_devicevariables !== devicevariablesOld){
                             devicevariablesOld = _devicevariables;
                             _update = 1;
@@ -286,22 +407,36 @@ module.exports = function(RED) {
                 return _update;
             }
 
-            function valuesWritten(anythingBad) {
+
+            /**
+             * call back valuesWritten
+             * @param numbar _anythingBad
+             * @private
+             */       
+            function valuesWritten(_anythingBad) {
                 try {
-                    if (anythingBad) { node.error("SOMETHING WENT WRONG WRITING VALUES!!!!"); }
-                    msg.payload = "Done writing.";
-                    node.send(msg);
+                    if (_anythingBad) {
+                        node.error("SOMETHING WENT WRONG WRITING VALUES!!!!");
+                    } else {
+                        msg.payload = "Done writing.";
+                        node.send(msg);
+                    }
                 } catch(e) {
                     node.error(e);                
                 }
             }
         });        
  
-        // node:close
-        node.on('close', function(removed, done) {
-            //node.log("mc-protocol-write:close removed:"+removed);
+        /**
+         * node on close
+         * @param numbar _removed
+         * @param function _done
+         * @private
+         */           
+        node.on('close', function(_removed, _done) {
+            debugLog(node,"mc-protocol-out:close removed:"+_removed,1);
             try {
-                if (removed) {
+                if (_removed) {
                     // This node has been deleted
                     disconnect();
                 } else {
@@ -311,51 +446,14 @@ module.exports = function(RED) {
                 if (typeof(mdConnection) !== "undefined") {
                     mdConnection = {};
                 }
-                done();
+                _done();
             } catch(e) {
                 node.error(e);                
             }
         });
 
-        // plc connect
-        function connect() {
-            //node.log("mc-protocol-write:connect");
-            try {
-                if (typeof(mdConnection) !== "undefined") {
-                    mdConnection.initiateConnection({port: node.plcport, host: node.plcaddress, ascii: false}, connected); 
-                }
-            } catch(e) {
-                node.error(e);                
-            }
-
-            // call back connected
-            function connected(err) {
-                //node.log("mc-protocol-write:connected");
-                try {
-                    if (typeof(err) !== "undefined") {
-                        // We have an error.  Maybe the PLC is not reachable.  
-                        console.log(err);
-                    } else {
-                        console.log('connected..');
-                    }
-                } catch(e) {
-                    node.error(e);                
-                }
-                return;
-            }    
-        }            
-
-        // plc disconect
-        function disconnect() {
-            //node.log("mc-protocol-write:disconnect");
-            try {
-                if (typeof(mdConnection) !== "undefined") {
-                    mdConnection.dropConnection();
-                }
-            } catch(e) {
-                node.error(e);                
-            }
-        }
+        // interval updateConnectionStats
+        setInterval(updateConnectionStats, tmrUpdateConectionStatus);
     }
-    RED.nodes.registerType("mc-protocol-write",McProtocolWriteNode);
+    RED.nodes.registerType("mc-protocol-write",McProtocolOutNode);
 }
