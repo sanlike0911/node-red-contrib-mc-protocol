@@ -1924,8 +1924,7 @@ function stringToMCAddr(addr, useraddr, octalInputOutput) {
 		theItem.remainder = 0;
 		theItem.requestOffset = theItem.offset;
 		theItem.dtypelen = 1;	
-		break;		
-	break;
+		break;
 	case "TN": // Current time value
 	case "CN": // Current count value
 	case "D":
@@ -1961,7 +1960,14 @@ function stringToMCAddr(addr, useraddr, octalInputOutput) {
 	case "X":
 	case "Y":
 	case "M":
+/* add sanlike */
+	case "L":	// Latch Relay
+	case "S":	// Step Relay
+	case "B":	// Link Relay
+/* add sanlike */
+/* del sanlike --
 	case "S":
+-- del sanlike */
 		theItem.addrtype = prefix;
 		theItem.datatype = "X";
 		theItem.multidtypelen = 2;
@@ -1973,16 +1979,14 @@ function stringToMCAddr(addr, useraddr, octalInputOutput) {
 		outputLog('Failed to find a match for ' + splitString2[0] + ' possibly because ' + prefix + ' type is not supported yet.');
 		return undefined;
 	}
-/* del sanlike */
-/*
+/* del sanlike --
 	// bitNative indicates if we have a bit data type within the PLC.
 	if (theItem.addrtype === "D" || theItem.addrtype === "R" || theItem.addrtype === "TN" || theItem.addrtype === "CN") {
 		theItem.bitNative = false;
 	} else {
 		theItem.bitNative = true;
 	}
-*/
-/* del sanlike */
+-- del sanlike */
 	switch (theItem.addrtype) {
 	case "D":	// Data
 		theItem.areaMCCode = 0x4420;
@@ -2041,19 +2045,18 @@ function stringToMCAddr(addr, useraddr, octalInputOutput) {
 /* add sanlike */
 	case "L":	// Latch Relay
 	case "S":	// Step Relay
+	case "B":	// Link Relay
 /* add sanlike */
 		theItem.areaMCCode = 0x4d20;
 		/* add sanlike */
 		theItem.bitNative = true;
 		/* add sanlike */
 		break;	
-/* del sanlike */
-/*
+/* del sanlike --
 	case "S":	// State
 		theItem.areaMCCode = 0x5320;
 		break;	
-*/
-/* del sanlike */
+-- del sanlike */
 	default:
 		outputLog('Failed to find a match for ' + theItem.addrtype + ' possibly because that type is not supported yet.');
 		return undefined;
@@ -2159,7 +2162,14 @@ function PLCItem() { // Object
 		case "X":	// Input
 		case "Y":	// Output
 		case "M":	// Auxiliary Relay
+/* add sanlike */
+		case "L":	// Latch Relay
+		case "S":	// Step Relay
+		case "B":	// Link Relay
+/* add sanlike */
+/* del sanlike --
 		case "S":	// State
+-- del sanlike */
 			return (isWriting) ? 40 : 16; // 160 points max when writing, 4 points per word = 40 words.  Otherwise 256 points max which is 16 words.
 		default:
 			outputLog('Failed to find a match for ' + theItem.addrtype + ' possibly because that type is not supported yet.');
@@ -2196,7 +2206,14 @@ function PLCItem() { // Object
 		case "X":	// Input
 		case "Y":	// Output
 		case "M":	// Auxiliary Relay
+/* add sanlike */
+		case "L":	// Latch Relay
+		case "S":	// Step Relay
+		case "B":	// Link Relay
+/* add sanlike */
+/* del sanlike --
 		case "S":	// State
+-- del sanlike */
 			return 1; 
 		default:
 			outputLog('Failed to find a match for ' + theItem.addrtype + ' possibly because that type is not supported yet.');

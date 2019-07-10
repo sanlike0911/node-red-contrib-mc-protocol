@@ -4,7 +4,6 @@ node-red-contrib-mc-protocolは、三菱電機（mitsubishielectric）のPLC(MEL
 
 ## CAUTION
 これはベータ版のソフトウェアであり、想定外の値が意図しないアドレスに書き込まれる可能性があります。
-本ソフトウェアは@plcpeople様のnode.jsライブラリ(mcprotocol)をNode-Red用にラッパーしています。詳細な仕様についてはnode.jsライブラリ(mcprotocol)を参照してください。
   
 ## 三菱PLC(MELSEC Qseries)の検証結果
 |No|device type|device name|type|dec/hec|device|code|result(read)|result(write)|note|
