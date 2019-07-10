@@ -6,7 +6,7 @@
  **/
 module.exports = function(RED) {
     'use strict';
-    var mdMcProtocol = require('mcprotocol');
+    var mdMcProtocol = require('./mcprotocol');
 
     // 0:disable, 1:debug, 2:info, 3:warning, 4:error
     const DebugLevel = 4;

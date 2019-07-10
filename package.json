@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "mc protocol",
   "dependencies": {
-    "mcprotocol": "0.1.1"
+    "underscore": "1.4.x"
   },
   "keywords": [
     "mc protocol"
