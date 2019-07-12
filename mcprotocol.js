@@ -1924,10 +1924,14 @@ function stringToMCAddr(addr, useraddr, octalInputOutput) {
 		theItem.remainder = 0;
 		theItem.requestOffset = theItem.offset;
 		theItem.dtypelen = 1;	
-		break;
+		break;		
+	break;
 	case "TN": // Current time value
 	case "CN": // Current count value
 	case "D":
+/* add sanlike */
+	case "W":
+/* add sanlike */
 	case "R":
 		// These are the double-byte types
 		theItem.addrtype = prefix;
@@ -1962,8 +1966,8 @@ function stringToMCAddr(addr, useraddr, octalInputOutput) {
 	case "M":
 /* add sanlike */
 	case "L":	// Latch Relay
-	case "S":	// Step Relay
-	case "B":	// Link Relay
+	case "SM":	// Step Relay
+	case "B":	// link Relay
 /* add sanlike */
 /* del sanlike --
 	case "S":
@@ -1979,81 +1983,67 @@ function stringToMCAddr(addr, useraddr, octalInputOutput) {
 		outputLog('Failed to find a match for ' + splitString2[0] + ' possibly because ' + prefix + ' type is not supported yet.');
 		return undefined;
 	}
-/* del sanlike --
+
 	// bitNative indicates if we have a bit data type within the PLC.
-	if (theItem.addrtype === "D" || theItem.addrtype === "R" || theItem.addrtype === "TN" || theItem.addrtype === "CN") {
+/* chg sanlike */
+	//if (theItem.addrtype === "D" || theItem.addrtype === "R" || theItem.addrtype === "TN" || theItem.addrtype === "CN") {
+	if (theItem.addrtype === "D" || theItem.addrtype === "W"  || theItem.addrtype === "R" || theItem.addrtype === "TN" || theItem.addrtype === "CN") {
+/* chg sanlike */
 		theItem.bitNative = false;
 	} else {
 		theItem.bitNative = true;
 	}
--- del sanlike */
+	
 	switch (theItem.addrtype) {
 	case "D":	// Data
 		theItem.areaMCCode = 0x4420;
 //		theItem.maxWordLen = 64;
-/* add sanlike */
-		theItem.bitNative = false;
-/* add sanlike */
 		break;
-	case "R":	// Extension
+/* add sanlike */
+	case "W":
+		theItem.areaMCCode = 0x5720;
+//		theItem.maxWordLen = 64;
+		break;
+/* add sanlike */
+		case "R":	// Extension
 		theItem.areaMCCode = 0x5220;
 //		theItem.maxWordLen = 64;
-/* add sanlike */
-		theItem.bitNative = false;
-/* add sanlike */
 		break;
 	case "TN":	// Timer current value
 		theItem.areaMCCode = 0x544e;
 //		theItem.maxWordLen = 64;
-/* add sanlike */
-		theItem.bitNative = false;
-/* add sanlike */
 		break;
 	case "TS":	// Timer contact
 		theItem.areaMCCode = 0x5453;
 //		theItem.maxWordLen = 64;
-/* add sanlike */
-		theItem.bitNative = true;
-/* add sanlike */
 		break;		
 	case "CN":	// Counter current value
 		theItem.areaMCCode = 0x434e;
 //		theItem.maxWordLen = (depends on whether it's 32-bit (>200) or not, see FX3U-ENET-ADP manual)
-/* add sanlike */
-		theItem.bitNative = false;
-/* add sanlike */
 		break;
 	case "CS":	// Counter contact
 		theItem.areaMCCode = 0x4353;
-/* add sanlike */
-		theItem.bitNative = true;
-/* add sanlike */
 		break;	
 	case "X":	// Input
 		theItem.areaMCCode = 0x5820;
-/* add sanlike */
-		theItem.bitNative = true;
-/* add sanlike */
 		break;	
 	case "Y":	// Output
 		theItem.areaMCCode = 0x5920; 
-/* add sanlike */
-		theItem.bitNative = true;
-/* add sanlike */
 		break;	
 	case "M":	// Auxiliary Relay
 /* add sanlike */
 	case "L":	// Latch Relay
-	case "S":	// Step Relay
-	case "B":	// Link Relay
+	case "SM":	// Step Relay
 /* add sanlike */
 		theItem.areaMCCode = 0x4d20;
-		/* add sanlike */
-		theItem.bitNative = true;
-		/* add sanlike */
 		break;	
+/* add sanlike */
+	case "B":	// link Relay
+		theItem.areaMCCode = 0x4220;
+		break;	
+/* add sanlike */
 /* del sanlike --
-	case "S":	// State
+		case "S":	// State
 		theItem.areaMCCode = 0x5320;
 		break;	
 -- del sanlike */
@@ -2146,6 +2136,9 @@ function PLCItem() { // Object
 		}
 		switch (this.addrtype) {
 		case "D":	// Data
+/* add sanlike */
+		case "W":
+/* add sanlike */
 		case "R":	// Extension
 		case "TN":	// Timer current value
 			return 64;
@@ -2164,8 +2157,8 @@ function PLCItem() { // Object
 		case "M":	// Auxiliary Relay
 /* add sanlike */
 		case "L":	// Latch Relay
-		case "S":	// Step Relay
-		case "B":	// Link Relay
+		case "SM":	// Step Relay
+		case "B":	// link Relay
 /* add sanlike */
 /* del sanlike --
 		case "S":	// State
@@ -2183,6 +2176,9 @@ function PLCItem() { // Object
 		}
 		switch (this.addrtype) {
 		case "D":	// Data
+/* add sanlike */
+		case "W":
+/* add sanlike */	
 		case "R":	// Extension
 			if (this.datatype === "REAL" || this.datatype === "DINT" || this.datatype === "DWORD") {
 				return 4;
@@ -2208,8 +2204,8 @@ function PLCItem() { // Object
 		case "M":	// Auxiliary Relay
 /* add sanlike */
 		case "L":	// Latch Relay
-		case "S":	// Step Relay
-		case "B":	// Link Relay
+		case "SM":	// Step Relay
+		case "B":	// link Relay
 /* add sanlike */
 /* del sanlike --
 		case "S":	// State
