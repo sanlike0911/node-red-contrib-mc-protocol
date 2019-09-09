@@ -84,8 +84,8 @@ var testsettings = [
 		   { enable:true,  case:'min',   code:'CN0,1',       written:-32768 										}
 		  ,{ enable:true,  case:'mid',   code:'CN512,1',     written:0      										}
 		  ,{ enable:true,  case:'max',   code:'CN1023,1',    written:32767	  										}
-		  ,{ enable:true,  case:'1word', code:'CN100,1',     written:randomNumber(-32768, 32767)					}
-		  ,{ enable:true,  case:'nword', code:'CN300,5',     written:[randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767)]}
+		  ,{ enable:true,  case:'1word', code:'CN100,1',     written:Math.floor( Math.random () * 32767) - 32768	}
+		  ,{ enable:true,  case:'nword', code:'CN300,5',     written:[Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768]}
 		  ,{ enable:false, case:'1bit',  code:'CN400.1',     written:randomPercentForTrue(50)						}
 		  ,{ enable:false, case:'nbit',  code:'CN500.1,20',  written:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0]		}
 		]
@@ -108,8 +108,8 @@ var testsettings = [
 		   { enable:true,  case:'min',   code:'TN0,1',       written:-32768 										}
 		  ,{ enable:true,  case:'mid',   code:'TN1000,1',    written:0      										}
 		  ,{ enable:true,  case:'max',   code:'TN2047,1',    written:32767  										}
-		  ,{ enable:true,  case:'1word', code:'TN100,1',     written:randomNumber(-32768, 32767)					}
-		  ,{ enable:true,  case:'nword', code:'TN300,5',     written:[randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767)] }
+		  ,{ enable:true,  case:'1word', code:'TN100,1',     written:Math.floor( Math.random () * 32767) - 32768	}
+		  ,{ enable:true,  case:'nword', code:'TN300,5',     written:[Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768] }
 		  ,{ enable:false, case:'1bit',  code:'TN400.1',     written:randomPercentForTrue(50)						}
 		  ,{ enable:false, case:'nbit',  code:'TN500.1,20',  written:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0]		}	
 		]
@@ -122,8 +122,8 @@ var testsettings = [
 			{ enable:true,  case:'min',   code:'D0,1',       written:-32768 										}
 		   ,{ enable:true,  case:'mid',   code:'D3000,1',    written:0      										}
 		   ,{ enable:true,  case:'max',   code:'D6143,1',    written:32767  										}
-		   ,{ enable:true,  case:'1word', code:'D1000,1',    written:randomNumber(-32768, 32767)					}
-		   ,{ enable:true,  case:'nword', code:'D3000,5',    written:[randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767)] }
+		   ,{ enable:true,  case:'1word', code:'D1000,1',    written:Math.floor( Math.random () * 32767) - 32768	}
+		   ,{ enable:true,  case:'nword', code:'D3000,5',    written:[Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768] }
 		   ,{ enable:false, case:'1bit',  code:'D4000.1',    written:randomPercentForTrue(50)						}
 		   ,{ enable:false, case:'nbit',  code:'D5000.1,20', written:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0]		}
 		 ]
@@ -136,8 +136,8 @@ var testsettings = [
 		   { enable:true,  case:'min',   code:'W0,1',       written:-32768 											}
 		  ,{ enable:true,  case:'mid',   code:'W100,1',     written:0      											}
 		  ,{ enable:true,  case:'max',   code:'WFFF,1',     written:32767  											}
-		  ,{ enable:true,  case:'1word', code:'W10,1',      written:randomNumber(-32768, 32767)						}
-		  ,{ enable:true,  case:'nword', code:'W30,5',      written:[randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767),randomNumber(-32768, 32767)] }
+		  ,{ enable:true,  case:'1word', code:'W10,1',      written:Math.floor( Math.random () * 32767) - 32768		}
+		  ,{ enable:true,  case:'nword', code:'W30,5',      written:[Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768,Math.floor( Math.random () * 32767) - 32768] }
 		  ,{ enable:false, case:'1bit',  code:'W40.1',      written:randomPercentForTrue(50)						}
 		  ,{ enable:false, case:'nbit',  code:'W50.1,20',   written:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0]		}
 		]
